@@ -1,0 +1,51 @@
+#! /usr/bin/env ruby
+
+require 'yaml'
+require 'optparse'
+require 'net/ssh'
+
+# Load the command line options
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: cfjunkie [options]"
+
+  opts.on("-v", "--verbose", "Be less quiet") do |v|
+    options[:verbose] = v
+  end
+
+  opts.on("-c", "--config FILE", "Specify the configuration file") do |conf|
+    options[:configfile] = conf
+  end
+
+end.parse!
+
+def loadconf (configfile)
+  # Load the configuration file
+  config = YAML::load(File.read(configfile))
+  config
+end
+
+
+def run(options)
+
+  # Determine if we should load the default configuration file
+  if options[:configfile].nil?
+    configfile = 'etc/cfjunkie.yaml'
+  else
+    configfile = options[:configfile]
+  end
+
+  config = loadconf(configfile)
+
+  # Get each switch configuration
+  config[:switchlist].each do |s|
+    Net::SSH.start(s, config[:username], :password => config[:password]) do |ssh|
+      output = ssh.exec!("show startup")
+      puts output
+    end
+  end
+
+
+end
+
+run(options)
