@@ -36,15 +36,43 @@ def run(options)
   end
 
   config = loadconf(configfile)
+  verbose = options[:verbose]
+
+  # ensure the storage directory exists
+  #Dir.mkdir(config[:storage], 0700) unless File.directory?(config[:storage])
+  fullpath = config[:storage] + config[:path]
+
+  unless File.directory?(config[:storage] + '/.git')
+  # Ensure the storage location is a git repo
+    puts "Cloning source repo..." if verbose
+    opts = '-q' unless verbose
+    %x{git clone #{opts} #{config[:gitrepo]} #{config[:storage]}}
+  else
+  # Fetch and reset the directory to match that of remote
+    Dir.chdir(config[:storage])
+    puts "Forcibly resetting to orign" if verbose
+    %x{git fetch origin master; git reset --hard origin/master}
+  end
+
+  Dir.chdir(fullpath)
+  exit 1 unless Dir.pwd == fullpath
+
+  # variables for munging passwords out of configs
+  regex = /\r\n/
+  newstring = "\n"
 
   # Get each switch configuration
   config[:switchlist].each do |s|
     Net::SSH.start(s, config[:username], :password => config[:password]) do |ssh|
       output = ssh.exec!("show startup")
-      puts output
+      output.gsub!( /\r\n/, "\n" )
+      output.gsub!( /\$1.+$/, "sneakybeast" )
+      filename = s + '.conf'
+      message  = "Auto-commit configuration: #{s}"
+      File.open(filename, 'w') {|f| f.write(output) }
+     %x{git add #{filename}; git ci -m '#{message}'; git push origin master}
     end
   end
-
 
 end
 
