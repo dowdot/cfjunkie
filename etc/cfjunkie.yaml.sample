@@ -2,6 +2,8 @@
 :username: 'monitor'
 :password: 'secret'
 :storage: '/opt/admin/netconfigs'
+:path: '/configs'
+:gitrepo: 'git@git.example.net:admin/switches.git'
 :switchlist: - switch1.example.net
              - switch2.example.net
              - switch3.example.net

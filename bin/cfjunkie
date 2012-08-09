@@ -41,17 +41,17 @@ def run(options)
   # ensure the storage directory exists
   #Dir.mkdir(config[:storage], 0700) unless File.directory?(config[:storage])
   fullpath = config[:storage] + config[:path]
+  gitopts = '-q' unless verbose
 
   unless File.directory?(config[:storage] + '/.git')
   # Ensure the storage location is a git repo
     puts "Cloning source repo..." if verbose
-    opts = '-q' unless verbose
-    %x{git clone #{opts} #{config[:gitrepo]} #{config[:storage]}}
+    %x{git clone #{gitopts} #{config[:gitrepo]} #{config[:storage]}}
   else
   # Fetch and reset the directory to match that of remote
     Dir.chdir(config[:storage])
     puts "Forcibly resetting to orign" if verbose
-    %x{git fetch origin master; git reset --hard origin/master}
+    %x{git fetch #{gitopts} origin master; git reset --hard origin/master; git pull #{gitopts} origin master}
   end
 
   Dir.chdir(fullpath)
@@ -62,17 +62,27 @@ def run(options)
   newstring = "\n"
 
   # Get each switch configuration
+  puts "Processing switches" if verbose
   config[:switchlist].each do |s|
+    puts "Connecting to switch #{s}" if verbose
     Net::SSH.start(s, config[:username], :password => config[:password]) do |ssh|
+      puts "dumping config" if verbose
       output = ssh.exec!("show startup")
+      puts "munging data" if verbose
       output.gsub!( /\r\n/, "\n" )
       output.gsub!( /\$1.+$/, "sneakybeast" )
       filename = s + '.conf'
       message  = "Auto-commit configuration: #{s}"
+      puts "writing the configiration to disk" if verbose
       File.open(filename, 'w') {|f| f.write(output) }
-     %x{git add #{filename}; git ci -m '#{message}'; git push origin master}
+      puts "commiting the updates" if verbose
+     %x{git add #{filename}; git ci -m '#{message}'}
     end
+    puts "pushig to master" if verbose
+    %x{git push #{gitopts} origin master}
   end
+
+  puts "Done!" if verbose
 
 end
 
