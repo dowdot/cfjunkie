@@ -31,7 +31,9 @@ Sample configuration:
 
 ## A word on password storage
 
-Since on our switches, we are using secret, the configs contain the hashed password for the users.  I didn't want to commit this to git, so I did some quick substitution to replace the password with the word 'sneakybeast'.  This seems sane enough for our usecase, but I only tested using a couple switches, and only a single method of password storage.  Its possible that in your environment, password obfuscation may be different, and it may be worth double checking before you commit your md5 to the git repo.  Just a thought.
+Since on our switches we are using secret, the configs contain the hashed password for the users.  I didn't want to commit this to git, so I did some quick substitution to replace the password with the word 'sneakybeast'.  This seems sane enough for our use case, but I only tested using a couple switches of the same IOS version, and only a single method of password storage.
+
+Its possible that in your environment, password obfuscation may be different, and it may be worth double checking before you commit your md5 to the git repo.  Just a thought.
 
 ## Authors
 
