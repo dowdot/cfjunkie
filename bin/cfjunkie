@@ -65,18 +65,26 @@ def run(options)
   puts "Processing switches" if verbose
   config[:switchlist].each do |s|
     puts "Connecting to switch #{s}" if verbose
-    Net::SSH.start(s, config[:username], :password => config[:password]) do |ssh|
-      puts "dumping config" if verbose
-      output = ssh.exec!("show startup")
-      puts "munging data" if verbose
-      output.gsub!( /\r\n/, "\n" )
-      output.gsub!( /\$1.+$/, "sneakybeast" )
-      filename = s + '.conf'
-      message  = "Auto-commit configuration: #{s}"
-      puts "writing the configiration to disk" if verbose
-      File.open(filename, 'w') {|f| f.write(output) }
-      puts "commiting the updates" if verbose
-     %x{git add #{filename}; git ci -m '#{message}'}
+    begin
+      Net::SSH.start(s, config[:username], :password => config[:password]) do |ssh|
+        puts "dumping config" if verbose
+        output = ssh.exec!("show startup")
+        puts "munging data" if verbose
+        output.gsub!( /\r\n/, "\n" )
+        output.gsub!( /\$1.+$/, "sneakybeast" )
+        filename = s + '.conf'
+        message  = "Auto-commit configuration: #{s}"
+        puts "writing the configiration to disk" if verbose
+        File.open(filename, 'w') {|f| f.write(output) }
+        puts "commiting the updates" if verbose
+      %x{git add #{filename}; git ci -m '#{message}'}
+      end
+    rescue Net::SSH::AuthenticationFailed => e
+      puts "ERROR: Unable to authenticate to switch #{s}: #{e}"
+    rescue Errno::ETIMEDOUT => e
+      puts "ERROR: Timeout connecting to switch #{s}: #{e}"
+    rescue => e
+      puts "ERROR: #{e}"
     end
     puts "pushig to master" if verbose
     %x{git push #{gitopts} origin master}
