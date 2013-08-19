@@ -87,7 +87,7 @@ module CFJunkie
               File.open(filename, 'w') {|f| f.write(output) }
 
               speak "commiting the updates"
-              %x{git add #{filename}; git ci -m '#{message}'}
+              %x{git add #{filename}; git commit -m '#{message}'}
             end
           rescue Net::SSH::AuthenticationFailed => e
             puts "ERROR: Unable to authenticate to switch #{d}: #{e}"
@@ -96,7 +96,7 @@ module CFJunkie
           rescue => e
             puts "ERROR: #{e}"
           end
-          speak "pushig to master"
+          speak "Pushing to master"
           %x{git push #{@gitopts} origin master}
         end
       end
