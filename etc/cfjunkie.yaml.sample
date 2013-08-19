@@ -7,3 +7,10 @@
 :switchlist: - switch1.example.net
              - switch2.example.net
              - switch3.example.net
+:switchgroups: 
+  :cisco:
+    - switch1.example.net
+    - switch2.example.net
+  :juniper:
+    - switch3.example.net
+    - switch4.example.net
