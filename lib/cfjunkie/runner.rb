@@ -61,13 +61,15 @@ module CFJunkie
         devices.each do |d|
           speak "Connecting to switch #{d}"
           begin
-            Net::SSH.start(d, @config[:username], :password => @config[:password]) do |ssh|
+            Net::SSH.start(d, @config[:username], :password => @config[:password], :keys => @config[:keys]) do |ssh|
               speak "  Retrieving configuration"
               case g
               when :cisco
                 show_cmd = "show startup"
               when :juniper
                 show_cmd = "show config | no-more | display set"
+              when :ucs
+                  show_cmd = "show configuration"
               end
               output = ssh.exec!(show_cmd)
 

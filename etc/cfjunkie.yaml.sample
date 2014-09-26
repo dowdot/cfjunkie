@@ -1,6 +1,7 @@
 ---
 :username: 'monitor'
 :password: 'secret'
+:keys: '/home/monitor/.ssh/id_rsa'
 :storage: '/opt/admin/netconfigs'
 :path: '/configs'
 :gitrepo: 'git@git.example.net:admin/switches.git'
