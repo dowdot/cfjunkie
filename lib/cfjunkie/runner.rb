@@ -67,9 +67,9 @@ module CFJunkie
               when :cisco
                 show_cmd = "show startup"
               when :juniper
-                show_cmd = "show config | no-more | display set"
+                show_cmd = "show configuration | no-more"
               when :ucs
-                  show_cmd = "show configuration"
+                show_cmd = "show configuration"
               end
               output = ssh.exec!(show_cmd)
 
