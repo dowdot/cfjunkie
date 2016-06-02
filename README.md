@@ -35,6 +35,12 @@ Since on our switches we are using secret, the configs contain the hashed passwo
 
 Its possible that in your environment, password obfuscation may be different, and it may be worth double checking before you commit your md5 to the git repo.  Just a thought.
 
+## block300interfaces
+
+This script runs 'show interfaces | display xml' for the two switch VCs at Block 300 and pushes the output to the sysops-network-configs repo for IT in pruning unused wired ports.
+
 ## Authors
 
 Zach Leslie <xaque208@gmail.com>
+Kris Amundson <kris@puppet.com>
+
