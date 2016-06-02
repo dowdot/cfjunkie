@@ -1,0 +1,24 @@
+#!/bin/bash
+
+##
+# block300interfaces
+#
+# This script pulls xml interface information from Block 300 5th and
+# 6th floor switch VCs.
+#
+# Uses the cfjunkie user and root ssh key.
+#
+
+ssh_id="/root/.ssh/id_rsa"
+ssh_user="config-backup"
+hosts=( pdx-626c1-vc1.ops.puppetlabs.net pdx-528r1-vc1.ops.puppetlabs.net )
+repo="/opt/cfjunkie/sysops-network-configs"
+
+for i in ${hosts[@]};
+do
+  ssh -i $ssh_id $ssh_user@${i} 'show interfaces | display xml' > $repo/interfaces/${i}.xml
+  git -C $repo add interfaces/${i}.xml
+done
+
+git -C $repo commit interfaces/*xml -m'Block 300 interfaces updated.'
+git -C $repo push
