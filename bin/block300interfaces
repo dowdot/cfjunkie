@@ -20,5 +20,5 @@ do
   git -C $repo add interfaces/${i}.xml
 done
 
-git -C $repo commit interfaces/*xml -m'Block 300 interfaces updated.'
+git -C $repo commit interfaces/*xml -m'Auto-commit: Block 300 interfaces updated.'
 git -C $repo push
